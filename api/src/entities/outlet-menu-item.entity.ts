@@ -5,13 +5,11 @@ import {
   Index,
   JoinColumn,
   ManyToOne,
-  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
 import { MenuItem } from './menu-item.entity';
-import { OutletInventory } from './outlet-inventory.entity';
 import { Outlet } from './outlet.entity';
 
 @Entity('outlet_menu_items')
@@ -50,7 +48,4 @@ export class OutletMenuItem {
   @ManyToOne(() => MenuItem, (item) => item.outletMenuItems, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'menu_item_id' })
   menuItem!: MenuItem;
-
-  @OneToOne(() => OutletInventory, (inv) => inv.outletMenuItem)
-  inventory!: OutletInventory;
 }

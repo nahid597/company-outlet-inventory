@@ -11,7 +11,6 @@ import {
 } from 'typeorm';
 
 import { Company } from './company.entity';
-import { OutletInventory } from './outlet-inventory.entity';
 import { OutletMenuItem } from './outlet-menu-item.entity';
 import { OutletReceiptSequence } from './outlet-receipt-sequence.entity';
 import { Sale } from './sale.entity';
@@ -46,9 +45,6 @@ export class Outlet {
 
   @OneToMany(() => OutletMenuItem, (omi) => omi.outlet)
   outletMenuItems!: OutletMenuItem[];
-
-  @OneToMany(() => OutletInventory, (inv) => inv.outletMenuItem)
-  inventories!: OutletInventory[];
 
   @OneToMany(() => Sale, (sale) => sale.outlet)
   sales!: Sale[];

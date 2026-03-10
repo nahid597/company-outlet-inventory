@@ -19,5 +19,7 @@ coverage/
 
 # OS/editor
 .DS_Store
-.vscode/
+# Track .vscode/settings.json (shared workspace config) but ignore personal files
+.vscode/*
+!.vscode/settings.json
 .idea/

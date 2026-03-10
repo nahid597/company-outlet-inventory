@@ -7,27 +7,27 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-} from 'typeorm';
+} from "typeorm";
 
-import { OutletMenuItem } from './outlet-menu-item.entity';
+import { OutletMenuItem } from "./outlet-menu-item.entity";
 
-@Entity('outlet_inventory')
-@Index(['outletMenuItem'], { unique: true })
+@Entity("outlet_inventory")
+@Index(["outletMenuItem"], { unique: true })
 @Check('"quantity" >= 0')
 export class OutletInventory {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn("uuid")
   id!: string;
 
-  @Column({ name: 'outlet_menu_item_id', type: 'uuid', unique: true })
+  @Column({ name: "outlet_menu_item_id", type: "uuid", unique: true })
   outletMenuItemId!: string;
 
-  @Column({ type: 'integer', default: 0 })
+  @Column({ type: "integer", default: 0 })
   quantity!: number;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn({ name: "updated_at" })
   updatedAt!: Date;
 
-  @OneToOne(() => OutletMenuItem, (omi) => omi.inventory, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'outlet_menu_item_id' })
+  @OneToOne(() => OutletMenuItem, { onDelete: "CASCADE" })
+  @JoinColumn({ name: "outlet_menu_item_id" })
   outletMenuItem!: OutletMenuItem;
 }
