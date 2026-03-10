@@ -1,0 +1,26 @@
+{
+  "name": "management-system",
+  "version": "1.0.0",
+  "description": "HQ and multi-outlet F&B management system built with Node.js, Express, PostgreSQL, TypeORM, and React.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "dev:api": "npm run dev --prefix api",
+    "dev:web": "npm run dev --prefix web",
+    "build:api": "npm run build --prefix api",
+    "build:web": "npm run build --prefix web",
+    "test:api": "npm run test --prefix api",
+    "test:web": "npm run test --prefix web",
+    "prepare": "husky"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@commitlint/cli": "^20.4.3",
+    "@commitlint/config-conventional": "^20.4.3",
+    "husky": "^9.1.7"
+  }
+}
