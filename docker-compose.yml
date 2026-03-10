@@ -7,7 +7,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: management_system
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
@@ -18,6 +18,9 @@ services:
     container_name: ms-api
     env_file:
       - ./api/.env.example
+    environment:
+      DB_HOST: postgres
+      DB_PORT: "5432"
     ports:
       - "4000:4000"
     depends_on:
