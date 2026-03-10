@@ -60,7 +60,7 @@ erDiagram
 
   outlet_inventory {
     uuid    id                   PK
-    uuid    outlet_menu_item_id  FK  UK  "→ outlet_menu_items.id  (1-to-1)"
+    uuid    outlet_menu_item_id  FK  "→ outlet_menu_items.id (UNIQUE, 1-to-1)"
     integer quantity                     "Stock level; CHECK >= 0 (DB constraint)"
     timestamptz updated_at
   }
@@ -71,7 +71,7 @@ erDiagram
 
   outlet_receipt_sequences {
     uuid    id             PK
-    uuid    outlet_id      FK  UK  "→ outlets.id  (1 row per outlet)"
+    uuid    outlet_id      FK  "→ outlets.id (UNIQUE, 1 row per outlet)"
     integer last_sequence          "Incremented inside SELECT … FOR UPDATE"
     timestamptz updated_at
   }
