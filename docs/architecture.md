@@ -115,29 +115,29 @@ erDiagram
 
 ### Key Design Decisions
 
-| Decision | Rationale |
-|---|---|
-| `outlet_menu_items` as junction table | Decouples master menu from per-outlet availability and price. HQ controls `menu_items`; outlets can only see what's assigned. |
-| `override_price` nullable on `outlet_menu_items` | `NULL` means "use `menu_items.base_price`". A non-null value overrides per outlet with no duplication. |
-| `outlet_inventory` is 1-to-1 with `outlet_menu_items` | Each assigned item has exactly one stock record per outlet. `CHECK quantity >= 0` at DB level prevents negative stock even on concurrent writes. |
-| `outlet_receipt_sequences` with `SELECT … FOR UPDATE` | One counter row per outlet, locked before increment. Guarantees monotonic, gap-free sequential receipt numbers under concurrent requests without a sequence per table. |
-| Immutable `total_amount` and `unit_price` on sale tables | Prices captured at transaction time are never recalculated. Menu price changes don't corrupt historical receipts. |
-| All monetary values as `NUMERIC` | Avoids IEEE-754 floating-point rounding errors for currency arithmetic. |
+| Decision                                                 | Rationale                                                                                                                                                              |
+| -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `outlet_menu_items` as junction table                    | Decouples master menu from per-outlet availability and price. HQ controls `menu_items`; outlets can only see what's assigned.                                          |
+| `override_price` nullable on `outlet_menu_items`         | `NULL` means "use `menu_items.base_price`". A non-null value overrides per outlet with no duplication.                                                                 |
+| `outlet_inventory` is 1-to-1 with `outlet_menu_items`    | Each assigned item has exactly one stock record per outlet. `CHECK quantity >= 0` at DB level prevents negative stock even on concurrent writes.                       |
+| `outlet_receipt_sequences` with `SELECT … FOR UPDATE`    | One counter row per outlet, locked before increment. Guarantees monotonic, gap-free sequential receipt numbers under concurrent requests without a sequence per table. |
+| Immutable `total_amount` and `unit_price` on sale tables | Prices captured at transaction time are never recalculated. Menu price changes don't corrupt historical receipts.                                                      |
+| All monetary values as `NUMERIC`                         | Avoids IEEE-754 floating-point rounding errors for currency arithmetic.                                                                                                |
 
 ---
 
 ## 2. Scaling Plan (10 Outlets · 100,000 Transactions/Month)
 
-> *To be completed in Phase 6.*
+> _To be completed in Phase 6._
 
 ---
 
 ## 3. Microservices Evolution Strategy
 
-> *To be completed in Phase 6.*
+> _To be completed in Phase 6._
 
 ---
 
 ## 4. Offline POS / KDS Sync Strategy
 
-> *To be completed in Phase 6.*
+> _To be completed in Phase 6._
