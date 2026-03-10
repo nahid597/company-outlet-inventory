@@ -1,0 +1,41 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ms-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: management_system
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: ms-api
+    env_file:
+      - ./api/.env.example
+    ports:
+      - "4000:4000"
+    depends_on:
+      - postgres
+    command: npm run dev
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    container_name: ms-web
+    env_file:
+      - ./web/.env.example
+    ports:
+      - "5173:5173"
+    depends_on:
+      - api
+    command: npm run dev -- --host
+
+volumes:
+  postgres_data:
