@@ -1,42 +1,235 @@
-#root {
-  max-width: 1280px;
+.shell {
+  width: min(1220px, 92vw);
   margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  padding: 2.5rem 0 3rem;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.hero {
+  background: linear-gradient(120deg, #033f63 0%, #28666e 35%, #7c9885 100%);
+  color: #f1faee;
+  border-radius: 18px;
+  padding: 1.8rem;
+  box-shadow: 0 20px 36px rgba(3, 63, 99, 0.2);
+  animation: rise-in 420ms ease-out;
 }
 
-@keyframes logo-spin {
+.hero-kicker {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.72rem;
+  opacity: 0.92;
+}
+
+.hero h1 {
+  margin: 0.5rem 0;
+  font-size: clamp(1.6rem, 3.2vw, 2.4rem);
+}
+
+.hero-text {
+  margin: 0;
+  max-width: 70ch;
+}
+
+.tabs {
+  margin-top: 1.2rem;
+  display: flex;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+}
+
+.tab {
+  border: 0;
+  background: #dce8e6;
+  color: #0f2523;
+  padding: 0.65rem 1rem;
+  border-radius: 999px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.tab.active {
+  background: #0b6e4f;
+  color: #effff7;
+}
+
+.banner {
+  margin-top: 1rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.banner.error {
+  background: #ffe3e0;
+  color: #892f24;
+}
+
+.banner.success {
+  background: #dbf5e7;
+  color: #0b5e3f;
+}
+
+.status {
+  margin-top: 1rem;
+}
+
+.panel-grid {
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 1rem;
+}
+
+.panel {
+  margin-top: 1rem;
+  border: 1px solid #dce8e6;
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 1rem;
+  box-shadow: 0 8px 18px rgba(16, 58, 54, 0.08);
+}
+
+.panel h2 {
+  margin: 0 0 0.8rem;
+  font-size: 1.15rem;
+}
+
+.form-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  color: #0f2523;
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+input,
+select,
+textarea,
+button {
+  font: inherit;
+}
+
+input,
+select,
+textarea {
+  border: 1px solid #b6c8c4;
+  border-radius: 8px;
+  padding: 0.54rem 0.6rem;
+  background: #f8fcfb;
+}
+
+.checkbox {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.action {
+  border: 0;
+  border-radius: 8px;
+  background: #12664f;
+  color: #f3fffa;
+  padding: 0.58rem 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.action.ghost {
+  background: #edf6f3;
+  color: #114839;
+}
+
+.action:disabled {
+  opacity: 0.68;
+  cursor: not-allowed;
+}
+
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 720px;
+}
+
+th,
+td {
+  border-bottom: 1px solid #e3edeb;
+  text-align: left;
+  padding: 0.6rem 0.5rem;
+  font-size: 0.92rem;
+  vertical-align: top;
+}
+
+th {
+  color: #1e403b;
+  background: #f3f8f7;
+  position: sticky;
+  top: 0;
+}
+
+.meta {
+  color: #446b66;
+  margin: 0 0 0.8rem;
+}
+
+.menu-cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.7rem;
+}
+
+.menu-cards li {
+  border: 1px solid #d8e8e5;
+  border-radius: 10px;
+  padding: 0.8rem;
+  background: linear-gradient(160deg, #ffffff 0%, #f4fbf9 100%);
+}
+
+.menu-cards h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.menu-cards p {
+  margin: 0.35rem 0 0;
+}
+
+.inline-controls {
+  margin-bottom: 0.8rem;
+}
+
+@keyframes rise-in {
   from {
-    transform: rotate(0deg);
+    opacity: 0;
+    transform: translateY(10px);
   }
   to {
-    transform: rotate(360deg);
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+@media (max-width: 900px) {
+  .panel-grid {
+    grid-template-columns: 1fr;
   }
-}
 
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
+  .form-panel {
+    order: 2;
+  }
 }
