@@ -1,1 +1,1 @@
-export {};
+export { MenuService } from "./menu.service";
