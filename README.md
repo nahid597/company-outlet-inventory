@@ -174,6 +174,34 @@ Response shape:
 
 ---
 
+### Outlet — Inventory
+
+| Method  | Path                                             | Description                                             |
+| ------- | ------------------------------------------------ | ------------------------------------------------------- |
+| `GET`   | `/outlets/:outletId/inventory`                   | List stock levels for all assigned menu items in outlet |
+| `PUT`   | `/outlets/:outletId/inventory/:outletMenuItemId` | Set absolute stock quantity                             |
+| `PATCH` | `/outlets/:outletId/inventory/:outletMenuItemId` | Adjust stock by signed delta (positive or negative)     |
+
+#### `PUT /outlets/:outletId/inventory/:outletMenuItemId` — request body
+
+```jsonc
+{
+  "quantity": 80, // integer, >= 0
+}
+```
+
+#### `PATCH /outlets/:outletId/inventory/:outletMenuItemId` — request body
+
+```jsonc
+{
+  "delta": -3, // non-zero integer
+}
+```
+
+Business rule: negative stock is blocked with `422` (`"Stock cannot go negative"`).
+
+---
+
 ### Error Responses
 
 All errors follow a consistent JSON shape:
@@ -209,7 +237,7 @@ management-system/
 │       └── validators/     # Zod schemas
 ├── web/                    # React + Vite frontend
 │   └── src/
-│       ├── App.tsx         # 3-tab dashboard (HQ Menu · Assignment · Outlet Menu)
+│       ├── App.tsx         # 4-tab dashboard (HQ Menu · Assignment · Outlet Menu · Inventory)
 │       └── App.css
 ├── docs/
 │   └── architecture.md     # ERD + design decisions
@@ -223,7 +251,7 @@ management-system/
 ### Running migrations
 
 ```bash
-cd api && npm run migration:run
+cd api && npm run typeorm:migrate
 ```
 
 ### Seeding
@@ -243,7 +271,7 @@ The seed inserts 1 company, 3 outlets, 5 menu items, outlet assignments, and inv
 | P0    | Monorepo scaffold, Docker, health endpoint               | ✅ Done    |
 | P1    | DB schema, TypeORM entities, migrations, seed data       | ✅ Done    |
 | P2    | Slice A — master menu CRUD, outlet assignment, menu view | ✅ Done    |
-| P3    | Slice B — inventory (stock levels, adjustments)          | ⏳ Pending |
+| P3    | Slice B — inventory (stock levels, adjustments)          | ✅ Done    |
 | P4    | Slice C — sales transactions, row locks, receipt numbers | ⏳ Pending |
 | P5    | Slice D — reporting                                      | ⏳ Pending |
 | P6    | Centralised validation, README, deploy, repo split       | ⏳ Pending |

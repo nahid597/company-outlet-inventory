@@ -6,6 +6,7 @@ import TabNav from "./components/layout/TabNav";
 import AssignmentForm from "./components/assignment/AssignmentForm";
 import AssignmentMenuPreview from "./components/assignment/AssignmentMenuPreview";
 import CreateMenuItemForm from "./components/hq-menu/CreateMenuItemForm";
+import InventoryView from "./components/inventory/InventoryView";
 import MenuItemTable from "./components/hq-menu/MenuItemTable";
 import OutletMenuView from "./components/outlet-menu/OutletMenuView";
 import { useAppData } from "./hooks/useAppData";
@@ -21,9 +22,11 @@ function App() {
     outlets,
     selectedOutletId,
     outletMenu,
+    outletInventory,
     newMenuItem,
     editDrafts,
     assignmentForm,
+    inventoryForm,
     onTabChange,
     onOutletSelect,
     onNewMenuItemChange,
@@ -32,6 +35,10 @@ function App() {
     onCreateMenuItem,
     onUpdateMenuItem,
     onAssignMenuItem,
+    onInventoryFormChange,
+    onInventoryOutletSelect,
+    onSetInventoryQuantity,
+    onAdjustInventoryQuantity,
   } = useAppData();
 
   return (
@@ -82,6 +89,19 @@ function App() {
           selectedOutletId={selectedOutletId}
           outletMenu={outletMenu}
           onOutletChange={onOutletSelect}
+        />
+      ) : null}
+
+      {!loading && activeTab === "inventory" ? (
+        <InventoryView
+          outlets={outlets}
+          outletInventory={outletInventory}
+          inventoryForm={inventoryForm}
+          saving={saving}
+          onInventoryOutletSelect={onInventoryOutletSelect}
+          onInventoryFormChange={onInventoryFormChange}
+          onSetInventoryQuantity={onSetInventoryQuantity}
+          onAdjustInventoryQuantity={onAdjustInventoryQuantity}
         />
       ) : null}
     </div>

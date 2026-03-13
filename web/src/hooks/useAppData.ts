@@ -2,14 +2,19 @@ import { useEffect } from "react";
 import type { FormEvent } from "react";
 
 import {
+  adjustInventoryQuantity,
   assignMenuItem,
   createMenuItem,
+  fetchOutletInventory,
   fetchOutletMenu,
   loadInitialData,
   setActiveTab,
+  setInventoryOutletId,
   setSelectedOutletId,
+  setInventoryQuantity,
   updateAssignmentFormField,
   updateEditDraftField,
+  updateInventoryFormField,
   updateMenuItem,
   updateNewMenuItemField,
 } from "../store/appSlice";
@@ -17,6 +22,7 @@ import { useAppDispatch, useAppSelector } from "../store/hooks";
 import type {
   AssignmentFormState,
   EditDraft,
+  InventoryFormState,
   MenuItem,
   NewMenuItemForm,
   TabId,
@@ -79,6 +85,32 @@ export function useAppData() {
     await dispatch(assignMenuItem());
   };
 
+  const onInventoryFormChange = (
+    field: keyof InventoryFormState,
+    value: string,
+  ): void => {
+    dispatch(updateInventoryFormField({ field, value }));
+  };
+
+  const onInventoryOutletSelect = (outletId: string): void => {
+    dispatch(setInventoryOutletId(outletId));
+    void dispatch(fetchOutletInventory(outletId));
+  };
+
+  const onSetInventoryQuantity = async (
+    event: FormEvent<HTMLFormElement>,
+  ): Promise<void> => {
+    event.preventDefault();
+    await dispatch(setInventoryQuantity());
+  };
+
+  const onAdjustInventoryQuantity = async (
+    event: FormEvent<HTMLFormElement>,
+  ): Promise<void> => {
+    event.preventDefault();
+    await dispatch(adjustInventoryQuantity());
+  };
+
   return {
     activeTab: app.activeTab,
     loading: app.loading,
@@ -89,9 +121,11 @@ export function useAppData() {
     outlets: app.outlets,
     selectedOutletId: app.selectedOutletId,
     outletMenu: app.outletMenu,
+    outletInventory: app.outletInventory,
     newMenuItem: app.newMenuItem,
     editDrafts: app.editDrafts,
     assignmentForm: app.assignmentForm,
+    inventoryForm: app.inventoryForm,
     onTabChange,
     onOutletSelect,
     onNewMenuItemChange,
@@ -100,5 +134,9 @@ export function useAppData() {
     onCreateMenuItem,
     onUpdateMenuItem,
     onAssignMenuItem,
+    onInventoryFormChange,
+    onInventoryOutletSelect,
+    onSetInventoryQuantity,
+    onAdjustInventoryQuantity,
   };
 }

@@ -26,6 +26,12 @@ export default function TabNav({ activeTab, onTabChange }: Props) {
       >
         Outlet Menu
       </button>
+      <button
+        className={activeTab === "inventory" ? "tab active" : "tab"}
+        onClick={() => onTabChange("inventory")}
+      >
+        Inventory
+      </button>
     </nav>
   );
 }

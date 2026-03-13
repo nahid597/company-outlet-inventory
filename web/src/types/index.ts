@@ -1,4 +1,4 @@
-export type TabId = "menu" | "assignment" | "outlet";
+export type TabId = "menu" | "assignment" | "outlet" | "inventory";
 
 export type MenuItem = {
   id: string;
@@ -52,4 +52,29 @@ export type AssignmentFormState = {
   menuItemId: string;
   overridePrice: string;
   isAvailable: boolean;
+};
+
+export type OutletInventoryItem = {
+  outletMenuItemId: string;
+  menuItemId: string;
+  name: string;
+  category: string | null;
+  basePrice: string;
+  overridePrice: string | null;
+  effectivePrice: string;
+  isAvailable: boolean;
+  quantity: number;
+  updatedAt: string | null;
+};
+
+export type OutletInventoryResponse = {
+  outlet: Outlet;
+  items: OutletInventoryItem[];
+};
+
+export type InventoryFormState = {
+  outletId: string;
+  outletMenuItemId: string;
+  quantity: string;
+  delta: string;
 };
