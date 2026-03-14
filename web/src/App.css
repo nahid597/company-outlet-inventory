@@ -213,6 +213,172 @@ th {
   margin-bottom: 0.8rem;
 }
 
+.sales-grid {
+  align-items: start;
+}
+
+.sales-meta-card {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.8rem;
+  border-radius: 10px;
+  background: #f3f8f7;
+  border: 1px solid #d9e7e4;
+}
+
+.catalog-grid {
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.7rem;
+}
+
+.catalog-card {
+  padding: 0.8rem;
+  border-radius: 10px;
+  border: 1px solid #d9e7e4;
+  background: linear-gradient(180deg, #ffffff 0%, #f4fbf9 100%);
+}
+
+.catalog-card h3,
+.receipt-card h3 {
+  margin: 0;
+}
+
+.catalog-card p {
+  margin: 0.3rem 0 0;
+}
+
+.inline-action {
+  padding: 0.38rem 0.65rem;
+}
+
+.cart-actions,
+.recent-sales-head,
+.receipt-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.cart-qty-input {
+  width: 84px;
+}
+
+.checkout-panel {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.checkout-total {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #114839;
+}
+
+.receipt-card {
+  margin-top: 1.2rem;
+  padding: 1rem;
+  border-radius: 14px;
+  border: 1px solid #d9e7e4;
+  background: linear-gradient(160deg, #fcfffe 0%, #eef7f4 100%);
+}
+
+.receipt-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.receipt-total {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #0b6e4f;
+}
+
+.recent-sales-panel {
+  margin-top: 1.2rem;
+}
+
+.recent-sales-list {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.recent-sale-card {
+  border: 1px solid #d9e7e4;
+  border-radius: 12px;
+  padding: 0.9rem;
+  background: #fbfefd;
+}
+
+.recent-sale-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 1rem;
+}
+
+.recent-sale-total {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #0b6e4f;
+}
+
+.recent-sale-items {
+  list-style: none;
+  margin: 0.8rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.recent-sale-items li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 0.45rem;
+  border-top: 1px solid #e7f0ee;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .receipt-card,
+  .receipt-card * {
+    visibility: visible;
+  }
+
+  .receipt-card {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    box-shadow: none;
+    background: #ffffff;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .receipt-card table {
+    min-width: auto;
+  }
+}
+
 @keyframes rise-in {
   from {
     opacity: 0;

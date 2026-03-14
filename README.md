@@ -15,7 +15,7 @@ HQ and multi-outlet F&B management system built with Node.js, Express, PostgreSQ
 
 ---
 
-## Quick Start
+## Setup Instructions
 
 ### Option A — Docker (recommended)
 
@@ -78,7 +78,7 @@ npm run dev            # http://localhost:5173
 
 ---
 
-## API Reference
+## API Endpoints
 
 All endpoints are prefixed with `/api/v1`.
 
@@ -202,6 +202,32 @@ Business rule: negative stock is blocked with `422` (`"Stock cannot go negative"
 
 ---
 
+### Outlet - Sales (POS)
+
+| Method | Path                       | Description                                 |
+| ------ | -------------------------- | ------------------------------------------- |
+| `GET`  | `/outlets/:outletId/sales` | List recent sales for an outlet (latest 10) |
+| `POST` | `/outlets/:outletId/sales` | Create a sale transaction and receipt       |
+
+#### `POST /outlets/:outletId/sales` - request body
+
+```jsonc
+{
+  "items": [{ "outletMenuItemId": "uuid", "quantity": 2 }],
+}
+```
+
+---
+
+### HQ - Reporting
+
+| Method | Path                                      | Description                        |
+| ------ | ----------------------------------------- | ---------------------------------- |
+| `GET`  | `/hq/reports/revenue-by-outlet`           | Revenue and sale counts by outlet  |
+| `GET`  | `/hq/reports/outlets/:outletId/top-items` | Top sold items for selected outlet |
+
+---
+
 ### Error Responses
 
 All errors follow a consistent JSON shape:
@@ -237,12 +263,68 @@ management-system/
 │       └── validators/     # Zod schemas
 ├── web/                    # React + Vite frontend
 │   └── src/
-│       ├── App.tsx         # 4-tab dashboard (HQ Menu · Assignment · Outlet Menu · Inventory)
+│       ├── App.tsx         # Dashboard tabs (Menu · Assignment · Outlet · Inventory · POS · Reports)
 │       └── App.css
 ├── docs/
-│   └── architecture.md     # ERD + design decisions
+│   ├── architecture.md     # ERD + scaling/microservice/offline strategy
+│   ├── deployment.md       # Deployment runbook
+│   └── repo-split-plan.md  # Monorepo to split-repo roadmap
 └── docker-compose.yml
 ```
+
+---
+
+## Schema Explanation
+
+The database schema models one company operating multiple outlets with HQ-controlled menu and outlet-level operations.
+
+Core schema flow:
+
+1. `menu_items`
+
+- Master menu definitions created by HQ.
+
+2. `outlet_menu_items`
+
+- Junction table connecting outlets to menu items.
+- Stores outlet-specific `override_price` and availability toggles.
+
+3. `outlet_inventory`
+
+- One inventory record per outlet-assigned menu item.
+- Enforces non-negative stock with DB-level check constraints.
+
+4. `sales` and `sale_items`
+
+- Immutable transaction records for receipt totals and line items.
+- Prices are captured at sale time for historical correctness.
+
+5. `outlet_receipt_sequences`
+
+- Per-outlet counter for concurrency-safe sequential receipt numbers.
+
+Refer to full ERD and field-level details in `docs/architecture.md`.
+
+---
+
+## Architecture Explanation
+
+This project follows a layered architecture in the API:
+
+- `routes`: endpoint mapping
+- `controllers`: request parsing and response shaping
+- `services`: business rules and transactional logic
+- `repositories`: data access
+- `validators`: Zod input validation schemas
+- `middlewares`: centralized error and not-found handling
+
+The frontend is organized by feature modules and centralized app state for HQ + outlet workflows (menu, assignment, inventory, POS sales, reporting).
+
+Architecture and scaling details are documented in:
+
+- `docs/architecture.md`
+- `docs/repo-split-plan.md`
+- `docs/deployment.md`
 
 ---
 
@@ -261,17 +343,3 @@ cd api && npm run seed
 ```
 
 The seed inserts 1 company, 3 outlets, 5 menu items, outlet assignments, and inventory records.
-
----
-
-## Implementation Progress
-
-| Phase | Scope                                                    | Status     |
-| ----- | -------------------------------------------------------- | ---------- |
-| P0    | Monorepo scaffold, Docker, health endpoint               | ✅ Done    |
-| P1    | DB schema, TypeORM entities, migrations, seed data       | ✅ Done    |
-| P2    | Slice A — master menu CRUD, outlet assignment, menu view | ✅ Done    |
-| P3    | Slice B — inventory (stock levels, adjustments)          | ✅ Done    |
-| P4    | Slice C — sales transactions, row locks, receipt numbers | ⏳ Pending |
-| P5    | Slice D — reporting                                      | ⏳ Pending |
-| P6    | Centralised validation, README, deploy, repo split       | ⏳ Pending |

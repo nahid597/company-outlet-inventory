@@ -1,3 +1,5 @@
+export { uuidSchema } from "./common.validator";
+
 export {
   assignMenuItemSchema,
   createMenuItemSchema,
@@ -14,3 +16,6 @@ export {
   inventoryOutletParamSchema,
   setInventorySchema,
 } from "./inventory.validator";
+
+export { createSaleSchema, saleOutletParamSchema } from "./sale.validator";
+export { reportOutletParamSchema } from "./report.validator";

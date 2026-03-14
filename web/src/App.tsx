@@ -9,6 +9,8 @@ import CreateMenuItemForm from "./components/hq-menu/CreateMenuItemForm";
 import InventoryView from "./components/inventory/InventoryView";
 import MenuItemTable from "./components/hq-menu/MenuItemTable";
 import OutletMenuView from "./components/outlet-menu/OutletMenuView";
+import ReportsView from "./components/reports/ReportsView";
+import SalesView from "./components/sales/SalesView";
 import { useAppData } from "./hooks/useAppData";
 
 function App() {
@@ -23,10 +25,18 @@ function App() {
     selectedOutletId,
     outletMenu,
     outletInventory,
+    salesInventory,
+    recentSales,
+    reportsRevenue,
+    reportsTopItems,
+    reportsOutletId,
     newMenuItem,
     editDrafts,
     assignmentForm,
     inventoryForm,
+    salesForm,
+    saleCart,
+    lastReceipt,
     onTabChange,
     onOutletSelect,
     onNewMenuItemChange,
@@ -39,6 +49,15 @@ function App() {
     onInventoryOutletSelect,
     onSetInventoryQuantity,
     onAdjustInventoryQuantity,
+    onSalesOutletSelect,
+    onSalesFormChange,
+    onAddSaleItem,
+    onRemoveSaleItem,
+    onUpdateSaleItemQuantity,
+    onClearSaleCart,
+    onCreateSale,
+    onRefreshRevenueReport,
+    onReportsOutletSelect,
   } = useAppData();
 
   return (
@@ -102,6 +121,37 @@ function App() {
           onInventoryFormChange={onInventoryFormChange}
           onSetInventoryQuantity={onSetInventoryQuantity}
           onAdjustInventoryQuantity={onAdjustInventoryQuantity}
+        />
+      ) : null}
+
+      {!loading && activeTab === "sales" ? (
+        <SalesView
+          outlets={outlets}
+          salesInventory={salesInventory}
+          recentSales={recentSales}
+          salesForm={salesForm}
+          saleCart={saleCart}
+          lastReceipt={lastReceipt}
+          saving={saving}
+          onSalesOutletSelect={onSalesOutletSelect}
+          onSalesFormChange={onSalesFormChange}
+          onAddSaleItem={onAddSaleItem}
+          onRemoveSaleItem={onRemoveSaleItem}
+          onUpdateSaleItemQuantity={onUpdateSaleItemQuantity}
+          onClearSaleCart={onClearSaleCart}
+          onCreateSale={onCreateSale}
+        />
+      ) : null}
+
+      {!loading && activeTab === "reports" ? (
+        <ReportsView
+          outlets={outlets}
+          reportsRevenue={reportsRevenue}
+          reportsTopItems={reportsTopItems}
+          reportsOutletId={reportsOutletId}
+          loading={loading}
+          onRefreshRevenueReport={onRefreshRevenueReport}
+          onReportsOutletSelect={onReportsOutletSelect}
         />
       ) : null}
     </div>

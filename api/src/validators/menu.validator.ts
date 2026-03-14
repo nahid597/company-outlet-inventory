@@ -1,11 +1,6 @@
 import { z } from "zod";
 
-const genericUuidSchema = z
-  .string()
-  .regex(
-    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
-    "Invalid UUID",
-  );
+import { uuidSchema } from "./common.validator";
 
 const nullableTrimmedString = z
   .string()
@@ -16,21 +11,21 @@ const nullableTrimmedString = z
   .optional();
 
 export const uuidParamSchema = z.object({
-  outletId: genericUuidSchema.optional(),
-  menuItemId: genericUuidSchema.optional(),
+  outletId: uuidSchema.optional(),
+  menuItemId: uuidSchema.optional(),
 });
 
 export const menuItemParamSchema = z.object({
-  menuItemId: genericUuidSchema,
+  menuItemId: uuidSchema,
 });
 
 export const outletParamSchema = z.object({
-  outletId: genericUuidSchema,
+  outletId: uuidSchema,
 });
 
 export const outletMenuAssignmentParamSchema = z.object({
-  outletId: genericUuidSchema,
-  menuItemId: genericUuidSchema,
+  outletId: uuidSchema,
+  menuItemId: uuidSchema,
 });
 
 export const createMenuItemSchema = z.object({
