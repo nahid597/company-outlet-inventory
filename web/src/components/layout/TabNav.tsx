@@ -32,6 +32,18 @@ export default function TabNav({ activeTab, onTabChange }: Props) {
       >
         Inventory
       </button>
+      <button
+        className={activeTab === "sales" ? "tab active" : "tab"}
+        onClick={() => onTabChange("sales")}
+      >
+        POS Sales
+      </button>
+      <button
+        className={activeTab === "reports" ? "tab active" : "tab"}
+        onClick={() => onTabChange("reports")}
+      >
+        Reports
+      </button>
     </nav>
   );
 }

@@ -2,21 +2,33 @@ import { useEffect } from "react";
 import type { FormEvent } from "react";
 
 import {
+  addSaleCartItem,
+  clearSaleCart,
+  createSale,
   adjustInventoryQuantity,
   assignMenuItem,
   createMenuItem,
   fetchOutletInventory,
   fetchOutletMenu,
+  fetchRecentSales,
+  fetchRevenueReport,
+  fetchSalesInventory,
+  fetchTopItemsReport,
   loadInitialData,
   setActiveTab,
   setInventoryOutletId,
+  setReportsOutletId,
+  setSalesOutletId,
   setSelectedOutletId,
   setInventoryQuantity,
+  removeSaleCartItem,
+  updateSaleCartItemQuantity,
   updateAssignmentFormField,
   updateEditDraftField,
   updateInventoryFormField,
   updateMenuItem,
   updateNewMenuItemField,
+  updateSalesFormField,
 } from "../store/appSlice";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import type {
@@ -25,6 +37,8 @@ import type {
   InventoryFormState,
   MenuItem,
   NewMenuItemForm,
+  OutletInventoryItem,
+  SalesFormState,
   TabId,
 } from "../types";
 
@@ -60,6 +74,11 @@ export function useAppData() {
     value: string | boolean,
   ): void => {
     dispatch(updateAssignmentFormField({ field, value }));
+
+    if (field === "outletId" && typeof value === "string") {
+      dispatch(setSelectedOutletId(value));
+      void dispatch(fetchOutletMenu(value));
+    }
   };
 
   const onOutletSelect = (outletId: string): void => {
@@ -111,6 +130,56 @@ export function useAppData() {
     await dispatch(adjustInventoryQuantity());
   };
 
+  const onSalesOutletSelect = (outletId: string): void => {
+    dispatch(setSalesOutletId(outletId));
+    void dispatch(fetchSalesInventory(outletId));
+    void dispatch(fetchRecentSales(outletId));
+  };
+
+  const onSalesFormChange = (
+    field: keyof SalesFormState,
+    value: string,
+  ): void => {
+    dispatch(updateSalesFormField({ field, value }));
+  };
+
+  const onAddSaleItem = (item: OutletInventoryItem, quantity: number): void => {
+    dispatch(addSaleCartItem({ item, quantity }));
+    dispatch(updateSalesFormField({ field: "outletMenuItemId", value: "" }));
+    dispatch(updateSalesFormField({ field: "quantity", value: "1" }));
+  };
+
+  const onRemoveSaleItem = (outletMenuItemId: string): void => {
+    dispatch(removeSaleCartItem(outletMenuItemId));
+  };
+
+  const onUpdateSaleItemQuantity = (
+    outletMenuItemId: string,
+    quantity: number,
+  ): void => {
+    dispatch(updateSaleCartItemQuantity({ outletMenuItemId, quantity }));
+  };
+
+  const onClearSaleCart = (): void => {
+    dispatch(clearSaleCart());
+  };
+
+  const onCreateSale = async (
+    event: FormEvent<HTMLFormElement>,
+  ): Promise<void> => {
+    event.preventDefault();
+    await dispatch(createSale());
+  };
+
+  const onRefreshRevenueReport = async (): Promise<void> => {
+    await dispatch(fetchRevenueReport());
+  };
+
+  const onReportsOutletSelect = async (outletId: string): Promise<void> => {
+    dispatch(setReportsOutletId(outletId));
+    await dispatch(fetchTopItemsReport(outletId));
+  };
+
   return {
     activeTab: app.activeTab,
     loading: app.loading,
@@ -122,10 +191,18 @@ export function useAppData() {
     selectedOutletId: app.selectedOutletId,
     outletMenu: app.outletMenu,
     outletInventory: app.outletInventory,
+    salesInventory: app.salesInventory,
+    recentSales: app.recentSales,
+    reportsRevenue: app.reportsRevenue,
+    reportsTopItems: app.reportsTopItems,
+    reportsOutletId: app.reportsOutletId,
     newMenuItem: app.newMenuItem,
     editDrafts: app.editDrafts,
     assignmentForm: app.assignmentForm,
     inventoryForm: app.inventoryForm,
+    salesForm: app.salesForm,
+    saleCart: app.saleCart,
+    lastReceipt: app.lastReceipt,
     onTabChange,
     onOutletSelect,
     onNewMenuItemChange,
@@ -138,5 +215,14 @@ export function useAppData() {
     onInventoryOutletSelect,
     onSetInventoryQuantity,
     onAdjustInventoryQuantity,
+    onSalesOutletSelect,
+    onSalesFormChange,
+    onAddSaleItem,
+    onRemoveSaleItem,
+    onUpdateSaleItemQuantity,
+    onClearSaleCart,
+    onCreateSale,
+    onRefreshRevenueReport,
+    onReportsOutletSelect,
   };
 }

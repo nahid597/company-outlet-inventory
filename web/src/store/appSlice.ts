@@ -9,8 +9,15 @@ import type {
   MenuItem,
   NewMenuItemForm,
   Outlet,
+  OutletInventoryItem,
   OutletInventoryResponse,
   OutletMenuResponse,
+  RevenueByOutletReport,
+  RecentSalesResponse,
+  SaleCartItem,
+  SaleReceipt,
+  SalesFormState,
+  TopItemsReport,
   TabId,
 } from "../types";
 
@@ -25,10 +32,18 @@ type AppState = {
   selectedOutletId: string;
   outletMenu: OutletMenuResponse | null;
   outletInventory: OutletInventoryResponse | null;
+  salesInventory: OutletInventoryResponse | null;
+  recentSales: RecentSalesResponse | null;
+  reportsRevenue: RevenueByOutletReport | null;
+  reportsTopItems: TopItemsReport | null;
+  reportsOutletId: string;
   newMenuItem: NewMenuItemForm;
   editDrafts: Record<string, EditDraft>;
   assignmentForm: AssignmentFormState;
   inventoryForm: InventoryFormState;
+  salesForm: SalesFormState;
+  saleCart: SaleCartItem[];
+  lastReceipt: SaleReceipt | null;
   initialized: boolean;
 };
 
@@ -47,8 +62,15 @@ const EMPTY_INVENTORY_FORM: InventoryFormState = {
   delta: "",
 };
 
+const EMPTY_SALES_FORM: SalesFormState = {
+  outletId: "",
+  outletMenuItemId: "",
+  quantity: "1",
+};
+
 const toDraftMap = (items: MenuItem[]): Record<string, EditDraft> => {
   const record: Record<string, EditDraft> = {};
+
   for (const item of items) {
     record[item.id] = {
       name: item.name,
@@ -58,6 +80,7 @@ const toDraftMap = (items: MenuItem[]): Record<string, EditDraft> => {
       isActive: item.isActive,
     };
   }
+
   return record;
 };
 
@@ -72,6 +95,11 @@ const initialState: AppState = {
   selectedOutletId: "",
   outletMenu: null,
   outletInventory: null,
+  salesInventory: null,
+  recentSales: null,
+  reportsRevenue: null,
+  reportsTopItems: null,
+  reportsOutletId: "",
   newMenuItem: EMPTY_NEW_ITEM,
   editDrafts: {},
   assignmentForm: {
@@ -81,6 +109,9 @@ const initialState: AppState = {
     isAvailable: true,
   },
   inventoryForm: EMPTY_INVENTORY_FORM,
+  salesForm: EMPTY_SALES_FORM,
+  saleCart: [],
+  lastReceipt: null,
   initialized: false,
 };
 
@@ -91,6 +122,7 @@ export const loadInitialData = createAsyncThunk<
     selectedOutletId: string;
     outletMenu: OutletMenuResponse | null;
     outletInventory: OutletInventoryResponse | null;
+    recentSales: RecentSalesResponse | null;
   },
   void,
   { rejectValue: string }
@@ -109,15 +141,26 @@ export const loadInitialData = createAsyncThunk<
         selectedOutletId,
         outletMenu: null,
         outletInventory: null,
+        recentSales: null,
       };
     }
 
-    const [outletMenu, outletInventory] = await Promise.all([
+    const [outletMenu, outletInventory, recentSales] = await Promise.all([
       apiRequest<OutletMenuResponse>(`/outlets/${selectedOutletId}/menu-items`),
-      apiRequest<OutletInventoryResponse>(`/outlets/${selectedOutletId}/inventory`),
+      apiRequest<OutletInventoryResponse>(
+        `/outlets/${selectedOutletId}/inventory`,
+      ),
+      apiRequest<RecentSalesResponse>(`/outlets/${selectedOutletId}/sales`),
     ]);
 
-    return { menuItems, outlets, selectedOutletId, outletMenu, outletInventory };
+    return {
+      menuItems,
+      outlets,
+      selectedOutletId,
+      outletMenu,
+      outletInventory,
+      recentSales,
+    };
   } catch (err) {
     return rejectWithValue(
       err instanceof Error ? err.message : "Failed to load data",
@@ -134,6 +177,7 @@ export const fetchOutletMenu = createAsyncThunk<
     if (!outletId) {
       return null;
     }
+
     return await apiRequest<OutletMenuResponse>(
       `/outlets/${outletId}/menu-items`,
     );
@@ -160,6 +204,80 @@ export const fetchOutletInventory = createAsyncThunk<
   } catch (err) {
     return rejectWithValue(
       err instanceof Error ? err.message : "Failed to load outlet inventory",
+    );
+  }
+});
+
+export const fetchSalesInventory = createAsyncThunk<
+  OutletInventoryResponse | null,
+  string,
+  { rejectValue: string }
+>("app/fetchSalesInventory", async (outletId, { rejectWithValue }) => {
+  try {
+    if (!outletId) {
+      return null;
+    }
+
+    return await apiRequest<OutletInventoryResponse>(
+      `/outlets/${outletId}/inventory`,
+    );
+  } catch (err) {
+    return rejectWithValue(
+      err instanceof Error ? err.message : "Failed to load POS inventory",
+    );
+  }
+});
+
+export const fetchRecentSales = createAsyncThunk<
+  RecentSalesResponse | null,
+  string,
+  { rejectValue: string }
+>("app/fetchRecentSales", async (outletId, { rejectWithValue }) => {
+  try {
+    if (!outletId) {
+      return null;
+    }
+
+    return await apiRequest<RecentSalesResponse>(`/outlets/${outletId}/sales`);
+  } catch (err) {
+    return rejectWithValue(
+      err instanceof Error ? err.message : "Failed to load recent sales",
+    );
+  }
+});
+
+export const fetchRevenueReport = createAsyncThunk<
+  RevenueByOutletReport,
+  void,
+  { rejectValue: string }
+>("app/fetchRevenueReport", async (_, { rejectWithValue }) => {
+  try {
+    return await apiRequest<RevenueByOutletReport>(
+      "/hq/reports/revenue-by-outlet",
+    );
+  } catch (err) {
+    return rejectWithValue(
+      err instanceof Error ? err.message : "Failed to load revenue report",
+    );
+  }
+});
+
+export const fetchTopItemsReport = createAsyncThunk<
+  TopItemsReport | null,
+  string,
+  { rejectValue: string }
+>("app/fetchTopItemsReport", async (outletId, { rejectWithValue }) => {
+  try {
+    if (!outletId) {
+      return null;
+    }
+
+    return await apiRequest<TopItemsReport>(
+      `/hq/reports/outlets/${outletId}/top-items`,
+    );
+  } catch (err) {
+    return rejectWithValue(
+      err instanceof Error ? err.message : "Failed to load top items report",
     );
   }
 });
@@ -266,7 +384,7 @@ export const assignMenuItem = createAsyncThunk<
   { state: { app: AppState }; rejectValue: string }
 >("app/assignMenuItem", async (_, { getState, rejectWithValue }) => {
   try {
-    const { assignmentForm, inventoryForm } = getState().app;
+    const { assignmentForm, inventoryForm, salesForm } = getState().app;
 
     await apiRequest(
       `/hq/outlets/${assignmentForm.outletId}/menu-items/${assignmentForm.menuItemId}`,
@@ -287,12 +405,15 @@ export const assignMenuItem = createAsyncThunk<
         )
       : null;
 
-    const outletInventory =
-      inventoryForm.outletId && inventoryForm.outletId === assignmentForm.outletId
-        ? await apiRequest<OutletInventoryResponse>(
-            `/outlets/${assignmentForm.outletId}/inventory`,
-          )
-        : null;
+    const shouldRefreshInventory =
+      inventoryForm.outletId === assignmentForm.outletId ||
+      salesForm.outletId === assignmentForm.outletId;
+
+    const outletInventory = shouldRefreshInventory
+      ? await apiRequest<OutletInventoryResponse>(
+          `/outlets/${assignmentForm.outletId}/inventory`,
+        )
+      : null;
 
     return {
       selectedOutletId: assignmentForm.outletId,
@@ -315,7 +436,9 @@ export const setInventoryQuantity = createAsyncThunk<
     const { inventoryForm } = getState().app;
 
     if (!inventoryForm.outletId || !inventoryForm.outletMenuItemId) {
-      return rejectWithValue("Select outlet and menu item before setting stock");
+      return rejectWithValue(
+        "Select outlet and menu item before setting stock",
+      );
     }
 
     if (inventoryForm.quantity.trim() === "") {
@@ -351,7 +474,9 @@ export const adjustInventoryQuantity = createAsyncThunk<
     const { inventoryForm } = getState().app;
 
     if (!inventoryForm.outletId || !inventoryForm.outletMenuItemId) {
-      return rejectWithValue("Select outlet and menu item before adjusting stock");
+      return rejectWithValue(
+        "Select outlet and menu item before adjusting stock",
+      );
     }
 
     if (inventoryForm.delta.trim() === "") {
@@ -380,6 +505,63 @@ export const adjustInventoryQuantity = createAsyncThunk<
   }
 });
 
+export const createSale = createAsyncThunk<
+  {
+    receipt: SaleReceipt;
+    salesInventory: OutletInventoryResponse;
+    recentSales: RecentSalesResponse;
+    outletInventory: OutletInventoryResponse | null;
+  },
+  void,
+  { state: { app: AppState }; rejectValue: string }
+>("app/createSale", async (_, { getState, rejectWithValue }) => {
+  try {
+    const { saleCart, salesForm, inventoryForm } = getState().app;
+
+    if (!salesForm.outletId) {
+      return rejectWithValue("Select an outlet before creating a sale");
+    }
+
+    if (saleCart.length === 0) {
+      return rejectWithValue(
+        "Add at least one item to the cart before checkout",
+      );
+    }
+
+    const receipt = await apiRequest<SaleReceipt>(
+      `/outlets/${salesForm.outletId}/sales`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          items: saleCart.map((item) => ({
+            outletMenuItemId: item.outletMenuItemId,
+            quantity: item.quantity,
+          })),
+        }),
+      },
+    );
+
+    const salesInventory = await apiRequest<OutletInventoryResponse>(
+      `/outlets/${salesForm.outletId}/inventory`,
+    );
+    const recentSales = await apiRequest<RecentSalesResponse>(
+      `/outlets/${salesForm.outletId}/sales`,
+    );
+
+    return {
+      receipt,
+      salesInventory,
+      recentSales,
+      outletInventory:
+        inventoryForm.outletId === salesForm.outletId ? salesInventory : null,
+    };
+  } catch (err) {
+    return rejectWithValue(
+      err instanceof Error ? err.message : "Failed to create sale",
+    );
+  }
+});
+
 const appSlice = createSlice({
   name: "app",
   initialState,
@@ -395,6 +577,21 @@ const appSlice = createSlice({
     setInventoryOutletId: (state, action: PayloadAction<string>) => {
       state.inventoryForm.outletId = action.payload;
       state.inventoryForm.outletMenuItemId = "";
+      state.error = null;
+      state.notice = null;
+    },
+    setReportsOutletId: (state, action: PayloadAction<string>) => {
+      state.reportsOutletId = action.payload;
+      state.error = null;
+      state.notice = null;
+    },
+    setSalesOutletId: (state, action: PayloadAction<string>) => {
+      state.salesForm.outletId = action.payload;
+      state.salesForm.outletMenuItemId = "";
+      state.salesForm.quantity = "1";
+      state.saleCart = [];
+      state.lastReceipt = null;
+      state.recentSales = null;
       state.error = null;
       state.notice = null;
     },
@@ -419,6 +616,7 @@ const appSlice = createSlice({
       if (!current) {
         return;
       }
+
       current[action.payload.field] = action.payload.value as never;
     },
     updateAssignmentFormField: (
@@ -428,7 +626,8 @@ const appSlice = createSlice({
         value: string | boolean;
       }>,
     ) => {
-      state.assignmentForm[action.payload.field] = action.payload.value as never;
+      state.assignmentForm[action.payload.field] = action.payload
+        .value as never;
     },
     updateInventoryFormField: (
       state,
@@ -438,6 +637,71 @@ const appSlice = createSlice({
       }>,
     ) => {
       state.inventoryForm[action.payload.field] = action.payload.value as never;
+    },
+    updateSalesFormField: (
+      state,
+      action: PayloadAction<{
+        field: keyof SalesFormState;
+        value: string;
+      }>,
+    ) => {
+      state.salesForm[action.payload.field] = action.payload.value as never;
+    },
+    addSaleCartItem: (
+      state,
+      action: PayloadAction<{ item: OutletInventoryItem; quantity: number }>,
+    ) => {
+      const normalizedQuantity = Number.isInteger(action.payload.quantity)
+        ? Math.max(1, action.payload.quantity)
+        : 1;
+
+      const existing = state.saleCart.find(
+        (item) =>
+          item.outletMenuItemId === action.payload.item.outletMenuItemId,
+      );
+
+      if (existing) {
+        existing.quantity = Math.min(
+          existing.quantity + normalizedQuantity,
+          action.payload.item.quantity,
+        );
+        existing.availableStock = action.payload.item.quantity;
+        return;
+      }
+
+      state.saleCart.push({
+        outletMenuItemId: action.payload.item.outletMenuItemId,
+        menuItemId: action.payload.item.menuItemId,
+        name: action.payload.item.name,
+        unitPrice: action.payload.item.effectivePrice,
+        quantity: Math.min(normalizedQuantity, action.payload.item.quantity),
+        availableStock: action.payload.item.quantity,
+      });
+    },
+    removeSaleCartItem: (state, action: PayloadAction<string>) => {
+      state.saleCart = state.saleCart.filter(
+        (item) => item.outletMenuItemId !== action.payload,
+      );
+    },
+    updateSaleCartItemQuantity: (
+      state,
+      action: PayloadAction<{ outletMenuItemId: string; quantity: number }>,
+    ) => {
+      const item = state.saleCart.find(
+        (entry) => entry.outletMenuItemId === action.payload.outletMenuItemId,
+      );
+
+      if (!item) {
+        return;
+      }
+
+      item.quantity = Math.max(
+        1,
+        Math.min(action.payload.quantity, item.availableStock),
+      );
+    },
+    clearSaleCart: (state) => {
+      state.saleCart = [];
     },
   },
   extraReducers: (builder) => {
@@ -457,7 +721,11 @@ const appSlice = createSlice({
         state.assignmentForm.outletId = action.payload.selectedOutletId;
         state.outletMenu = action.payload.outletMenu;
         state.outletInventory = action.payload.outletInventory;
+        state.salesInventory = action.payload.outletInventory;
+        state.recentSales = action.payload.recentSales;
+        state.reportsOutletId = action.payload.selectedOutletId;
         state.inventoryForm.outletId = action.payload.selectedOutletId;
+        state.salesForm.outletId = action.payload.selectedOutletId;
       })
       .addCase(loadInitialData.rejected, (state, action) => {
         state.loading = false;
@@ -482,6 +750,46 @@ const appSlice = createSlice({
       })
       .addCase(fetchOutletInventory.rejected, (state, action) => {
         state.error = action.payload ?? "Failed to load outlet inventory";
+      })
+      .addCase(fetchSalesInventory.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(fetchSalesInventory.fulfilled, (state, action) => {
+        state.error = null;
+        state.salesInventory = action.payload;
+      })
+      .addCase(fetchSalesInventory.rejected, (state, action) => {
+        state.error = action.payload ?? "Failed to load POS inventory";
+      })
+      .addCase(fetchRecentSales.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(fetchRecentSales.fulfilled, (state, action) => {
+        state.error = null;
+        state.recentSales = action.payload;
+      })
+      .addCase(fetchRecentSales.rejected, (state, action) => {
+        state.error = action.payload ?? "Failed to load recent sales";
+      })
+      .addCase(fetchRevenueReport.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(fetchRevenueReport.fulfilled, (state, action) => {
+        state.error = null;
+        state.reportsRevenue = action.payload;
+      })
+      .addCase(fetchRevenueReport.rejected, (state, action) => {
+        state.error = action.payload ?? "Failed to load revenue report";
+      })
+      .addCase(fetchTopItemsReport.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(fetchTopItemsReport.fulfilled, (state, action) => {
+        state.error = null;
+        state.reportsTopItems = action.payload;
+      })
+      .addCase(fetchTopItemsReport.rejected, (state, action) => {
+        state.error = action.payload ?? "Failed to load top items report";
       })
       .addCase(createMenuItem.pending, (state) => {
         state.saving = true;
@@ -531,7 +839,15 @@ const appSlice = createSlice({
         state.selectedOutletId = action.payload.selectedOutletId;
         state.outletMenu = action.payload.outletMenu;
         if (action.payload.outletInventory) {
-          state.outletInventory = action.payload.outletInventory;
+          if (
+            state.inventoryForm.outletId === action.payload.selectedOutletId
+          ) {
+            state.outletInventory = action.payload.outletInventory;
+          }
+
+          if (state.salesForm.outletId === action.payload.selectedOutletId) {
+            state.salesInventory = action.payload.outletInventory;
+          }
         }
       })
       .addCase(assignMenuItem.rejected, (state, action) => {
@@ -548,6 +864,9 @@ const appSlice = createSlice({
         state.error = null;
         state.notice = "Inventory quantity updated.";
         state.outletInventory = action.payload;
+        if (state.salesForm.outletId === action.payload.outlet.id) {
+          state.salesInventory = action.payload;
+        }
         state.inventoryForm.quantity = "";
       })
       .addCase(setInventoryQuantity.rejected, (state, action) => {
@@ -564,23 +883,56 @@ const appSlice = createSlice({
         state.error = null;
         state.notice = "Inventory quantity adjusted.";
         state.outletInventory = action.payload;
+        if (state.salesForm.outletId === action.payload.outlet.id) {
+          state.salesInventory = action.payload;
+        }
         state.inventoryForm.delta = "";
       })
       .addCase(adjustInventoryQuantity.rejected, (state, action) => {
         state.saving = false;
         state.error = action.payload ?? "Failed to adjust inventory quantity";
+      })
+      .addCase(createSale.pending, (state) => {
+        state.saving = true;
+        state.error = null;
+        state.notice = null;
+      })
+      .addCase(createSale.fulfilled, (state, action) => {
+        state.saving = false;
+        state.error = null;
+        state.notice = `Sale ${action.payload.receipt.receiptNumber} created.`;
+        state.lastReceipt = action.payload.receipt;
+        state.salesInventory = action.payload.salesInventory;
+        state.recentSales = action.payload.recentSales;
+        if (action.payload.outletInventory) {
+          state.outletInventory = action.payload.outletInventory;
+        }
+        state.saleCart = [];
+        state.salesForm.outletMenuItemId = "";
+        state.salesForm.quantity = "1";
+      })
+      .addCase(createSale.rejected, (state, action) => {
+        state.saving = false;
+        state.error = action.payload ?? "Failed to create sale";
       });
   },
 });
 
 export const {
+  addSaleCartItem,
+  clearSaleCart,
+  removeSaleCartItem,
   setActiveTab,
-  setSelectedOutletId,
   setInventoryOutletId,
-  updateNewMenuItemField,
-  updateEditDraftField,
+  setReportsOutletId,
+  setSalesOutletId,
+  setSelectedOutletId,
+  updateSaleCartItemQuantity,
   updateAssignmentFormField,
+  updateEditDraftField,
   updateInventoryFormField,
+  updateNewMenuItemField,
+  updateSalesFormField,
 } = appSlice.actions;
 
 export default appSlice.reducer;

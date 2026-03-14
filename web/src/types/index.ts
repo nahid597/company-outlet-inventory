@@ -1,4 +1,10 @@
-export type TabId = "menu" | "assignment" | "outlet" | "inventory";
+export type TabId =
+  | "menu"
+  | "assignment"
+  | "outlet"
+  | "inventory"
+  | "sales"
+  | "reports";
 
 export type MenuItem = {
   id: string;
@@ -77,4 +83,82 @@ export type InventoryFormState = {
   outletMenuItemId: string;
   quantity: string;
   delta: string;
+};
+
+export type SalesFormState = {
+  outletId: string;
+  outletMenuItemId: string;
+  quantity: string;
+};
+
+export type SaleCartItem = {
+  outletMenuItemId: string;
+  menuItemId: string;
+  name: string;
+  unitPrice: string;
+  quantity: number;
+  availableStock: number;
+};
+
+export type SaleReceiptItem = {
+  outletMenuItemId: string;
+  menuItemId: string;
+  name: string;
+  quantity: number;
+  unitPrice: string;
+  subtotal: string;
+  remainingStock: number;
+};
+
+export type SaleReceipt = {
+  saleId: string;
+  receiptNumber: string;
+  totalAmount: string;
+  createdAt: string;
+  outlet: Outlet;
+  items: SaleReceiptItem[];
+};
+
+export type RecentSaleItem = SaleReceiptItem & {
+  saleItemId: string;
+};
+
+export type RecentSale = {
+  saleId: string;
+  receiptNumber: string;
+  totalAmount: string;
+  createdAt: string;
+  itemCount: number;
+  items: RecentSaleItem[];
+};
+
+export type RecentSalesResponse = {
+  outlet: Outlet;
+  sales: RecentSale[];
+};
+
+export type RevenueByOutletRow = {
+  outletId: string;
+  outletCode: string;
+  outletName: string;
+  saleCount: number;
+  totalRevenue: string;
+};
+
+export type RevenueByOutletReport = {
+  generatedAt: string;
+  outlets: RevenueByOutletRow[];
+};
+
+export type TopItemRow = {
+  menuItemId: string;
+  name: string;
+  quantitySold: number;
+  revenue: string;
+};
+
+export type TopItemsReport = {
+  generatedAt: string;
+  outlet: Outlet;
+  items: TopItemRow[];
 };

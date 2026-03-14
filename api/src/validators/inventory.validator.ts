@@ -1,19 +1,14 @@
 import { z } from "zod";
 
-const genericUuidSchema = z
-  .string()
-  .regex(
-    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
-    "Invalid UUID",
-  );
+import { uuidSchema } from "./common.validator";
 
 export const inventoryOutletParamSchema = z.object({
-  outletId: genericUuidSchema,
+  outletId: uuidSchema,
 });
 
 export const inventoryItemParamSchema = z.object({
-  outletId: genericUuidSchema,
-  outletMenuItemId: genericUuidSchema,
+  outletId: uuidSchema,
+  outletMenuItemId: uuidSchema,
 });
 
 export const setInventorySchema = z.object({
